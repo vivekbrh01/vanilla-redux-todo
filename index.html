@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<!-- CSS -->
+		<link rel="stylesheet" href="./styles.css" />
+
+		<!-- Scripts -->
+		<script src="https://npmcdn.com/redux@latest/dist/redux.js"></script>
+		<script defer src="./polyfill.js"></script>
+		<script defer src="./actionTypes.js"></script>
+		<script defer src="./actions.js"></script>
+		<script defer src="./reducers.js"></script>
+		<script defer src="./app.js"></script>
+
+		<!-- Title -->
+		<title>Todo | VanillaJS-Redux</title>
+	</head>
+	<body>
+		<section class="todoapp">
+			<header class="header">
+				<h1>todos</h1>
+				<input
+					type="text"
+					class="new-todo"
+					placeholder="What needs to be done?"
+				/>
+			</header>
+			<main class="main">
+				<ul class="todo-list"></ul>
+			</main>
+		</section>
+	</body>
+</html>
