@@ -8,12 +8,8 @@
 		<link rel="stylesheet" href="./styles.css" />
 
 		<!-- Scripts -->
-		<script src="https://npmcdn.com/redux@latest/dist/redux.js"></script>
-		<script defer src="./polyfill.js"></script>
-		<script defer src="./actionTypes.js"></script>
-		<script defer src="./actions.js"></script>
-		<script defer src="./reducers.js"></script>
-		<script defer src="./app.js"></script>
+		<script defer src="https://npmcdn.com/redux@latest/dist/redux.js"></script>
+		<script defer src="./index.js"></script>
 
 		<!-- Title -->
 		<title>Todo | VanillaJS-Redux</title>
@@ -31,6 +27,14 @@
 			<main class="main">
 				<ul class="todo-list"></ul>
 			</main>
+			<footer>
+				<ul class="footer-list">
+					<li><button class="footer-button">All</button></li>
+					<li><button class="footer-button">Active</button></li>
+					<li><button class="footer-button">Completed</button></li>
+					<li><button class="footer-button">Clear Completed</button></li>
+				</ul>
+			</footer>
 		</section>
 	</body>
 </html>
