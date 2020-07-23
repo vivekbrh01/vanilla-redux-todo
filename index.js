@@ -1,5 +1,24 @@
 let inputText = document.querySelector("input[type='text']");
 let ul = document.querySelector(".todo-list");
+let ulFooter = document.querySelector(".footer-list");
+
+let allButton = document.querySelector(".all");
+let activeButton = document.querySelector(".active");
+let completedButton = document.querySelector(".completed");
+let clearButton = document.querySelector(".clear");
+
+allButton.addEventListener("click", ({ target }) =>
+	handleChange(target.innerText)
+);
+activeButton.addEventListener("click", ({ target }) =>
+	handleChange(target.innerText)
+);
+completedButton.addEventListener("click", ({ target }) =>
+	handleChange(target.innerText)
+);
+clearButton.addEventListener("click", function () {
+	dispatch({ type: "CLEAR_COMPLETED_TODO" });
+});
 
 // Store
 
@@ -7,58 +26,78 @@ let id = 0;
 
 let initialState = {
 	allTodos: [
-		{ text: "Learn DOM", isDone: false, id: id++ },
-		{ text: "Learn React", isDone: false, id: id++ },
+		// { text: "Learn DOM", isDone: false, id: id++ },
+		// { text: "Learn React", isDone: false, id: id++ },
 	],
-	activeTab: "all",
+	activeTab: "All",
 };
 
 // Reducers
 
-function reducer(state = initialState, action) {
+function allTodosReducer(state = initialState.allTodos, action) {
 	switch (action.type) {
 		case "ADD_TODO":
-			return {
-				...state,
-				allTodos: [
-					...state.allTodos,
-					{ text: action.text, isDone: false, id: id++ },
-				],
-			};
+			return [...state, { text: action.payload, isDone: false, id: id++ }];
 		case "TOGGLE_TODO":
-			return {
-				...state,
-				allTodos: state.allTodos.map((todo) => {
-					if (todo.id === action.id) {
-						return {
-							...todo,
-							isDone: !todo.isDone,
-						};
-					}
-					return todo;
-				}),
-			};
+			return state.map((todo) => {
+				if (todo.id === action.payload) {
+					return {
+						...todo,
+						isDone: !todo.isDone,
+					};
+				}
+				return todo;
+			});
 		case "REMOVE_TODO":
-			return 0;
+			return state.filter((todo) => todo.id !== action.payload);
+		case "CLEAR_COMPLETED_TODO":
+			return state.filter((todo) => !todo.isDone);
 		default:
-			break;
+			return state;
+	}
+}
+
+function activeTabReducer(state = initialState.activeTab, action) {
+	switch (action.type) {
+		case "CHANGE":
+			return action.payload;
+		default:
+			return state;
 	}
 }
 
 // Actions
 
-let addTodoAction = (text) => ({
+let addTodoAction = (payload) => ({
 	type: "ADD_TODO",
-	text,
+	payload,
 });
 
-let toggleTodoAction = (id) => ({
+let toggleTodoAction = (payload) => ({
 	type: "TOGGLE_TODO",
-	id,
+	payload,
 });
 
+let removeTodoAction = (payload) => ({
+	type: "REMOVE_TODO",
+	payload,
+});
+
+let changeTabAction = (payload) => ({
+	type: "CHANGE",
+	payload,
+});
+
+let clearCompletedAction = () => ({
+	type: "CLEAR_COMPLETED_TODO",
+});
+
+let rootReducer = Redux.combineReducers({
+	allTodos: allTodosReducer,
+	activeTab: activeTabReducer,
+});
 let { dispatch, getState, subscribe } = Redux.createStore(
-	reducer /* preloadedState */,
+	rootReducer /* preloadedState */,
 	window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 
@@ -67,11 +106,20 @@ let { dispatch, getState, subscribe } = Redux.createStore(
 function handleAddTodo({ target, keyCode }) {
 	if (keyCode === 13) {
 		dispatch(addTodoAction(target.value));
+		target.value = "";
 	}
 }
 
 function handleToggle(id) {
 	dispatch(toggleTodoAction(id));
+}
+
+function handleDelete(id) {
+	dispatch(removeTodoAction(id));
+}
+
+function handleClearCompleted() {
+	dispatch(clearCompletedAction());
 }
 
 function createUI(root, data) {
@@ -93,12 +141,34 @@ function createUI(root, data) {
 		p.innerText = todo.text;
 		let spanDel = document.createElement("span");
 		spanDel.innerText = "X";
+		spanDel.addEventListener("click", () => handleDelete(todo.id));
 		li.append(span, p, spanDel);
 
 		ul.append(li);
 	});
 }
 
-subscribe(() => createUI(ul, getState().allTodos));
+function filterTodo(active, all) {
+	switch (active) {
+		case "Active":
+			return all.filter((todo) => !todo.isDone);
+		case "Completed":
+			return all.filter((todo) => todo.isDone);
+		default:
+			return all;
+	}
+}
+
+subscribe(() =>
+	createUI(ul, filterTodo(getState().activeTab, getState().allTodos))
+);
 
 inputText.addEventListener("keyup", handleAddTodo);
+
+function handleChange(newTab) {
+	dispatch(changeTabAction(newTab));
+}
+
+// [...ulFooter.children].forEach((elm) =>
+// 	elm.addEventListener("click", ({ target }) => handleChange(target.innerText))
+// );
